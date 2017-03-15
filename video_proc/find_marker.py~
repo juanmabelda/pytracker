@@ -19,7 +19,7 @@ def _hamming_distance(a, b):
 
             
 #
-def find_marker_in_image(img, marc_gris, marker, thr_len=50, crnr_dist=50):
+def find_marker_in_image(img, marc_gris, marker, thr_len=50, crnr_dist=125):
     '''Finds an AR marker defined by marker in a binary image'''
 
     # Tamaño del patrone
