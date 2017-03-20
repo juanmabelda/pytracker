@@ -13,7 +13,7 @@ from videofile_mgn import videofile
 # termination criteria
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
-def callibration(filename, chessboard, draw=False, the_size = 0.03):
+def callibration(video, chessboard, draw_func=None, the_size = 0.03):
     '''Perform a callibration on a chessboard of given dimensions'''
 
     tablero = tuple(chessboard)
@@ -26,9 +26,9 @@ def callibration(filename, chessboard, draw=False, the_size = 0.03):
     objpoints = [] # 3d point in real world space
     imgpoints = [] # 2d points in image plane.
     
-    images = videofile(filename)    
+    #images = videofile(filename)    
     
-    for img in  images:
+    for img in  video:
         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     
         # Find the chess board corners
@@ -39,16 +39,17 @@ def callibration(filename, chessboard, draw=False, the_size = 0.03):
             objpoints.append(objp)
     
             corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
-            if corners2 == None:
+            if type(corners2) == type(None):
                 corners2 = corners
             
             imgpoints.append(corners2)
     
             # Draw and display the corners
-            if draw:
+            if draw_func != None:
                 cv2.drawChessboardCorners(img, tablero, corners2,ret)
-                cv2.imshow('img',img)
-                cv2.waitKey(50)
+                draw_func(img)
+                #cv2.imshow('img',img)
+                #cv2.waitKey(50)
             
     
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints,
