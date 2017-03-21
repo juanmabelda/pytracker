@@ -15,6 +15,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #, NavigationToo
 # implement the default mpl key bindings
 from matplotlib.backend_bases import key_press_handler
 from tkFileDialog   import askopenfilename, askdirectory, asksaveasfilename
+from ttk import Treeview, Scrollbar
 import tkMessageBox
 
 # The video management system
@@ -113,6 +114,11 @@ class WndCal(Frame):
         menu.add_cascade(label="Chess", menu=chessmenu)
         chessmenu.add_command(label="Define chess", command=self.define_chess)
         
+        # The main frame to hold the main figure the AR marker figure and
+        # the treeview
+        frm_main = Frame(self._parent)
+        frm_main.pack(side=TOP,fill=BOTH, expand=1)
+        
         # The matplotilb figure
         self._figure = Figure(figsize=(5,4), dpi=100)        
         axes = self._figure.add_subplot(111)
@@ -131,11 +137,66 @@ class WndCal(Frame):
         #self._axes.hold(False) # To provide some cleaning
         
         # Packing the figure
-        canvas = FigureCanvasTkAgg(self._figure, master=parent)
+        canvas = FigureCanvasTkAgg(self._figure, master=frm_main)
         self._canvas = canvas
         #from numpy.random import rand
         canvas.show()
-        canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        canvas.get_tk_widget().pack(side=LEFT, fill=BOTH, expand=1)
+        
+        # Another figure for the AR marker
+        self._figure2 = Figure(figsize=(1,1), dpi=100)
+        axes2 = self._figure2.add_subplot(111)
+        # Removing the uwanted things of the axes
+        axes2.tick_params(axis="both",
+                         which="both",
+                         top="off",
+                         bottom="off",
+                         left="off",
+                         right="off",
+                         labelbottom="off",
+                         labelleft="off")
+        
+        self._axes2 = axes2
+        
+        
+        from numpy.random import rand
+        axes2.plot(rand(16))
+        
+        #......................................................
+        # Another frame to hold AR and marker
+        frm_submain = Frame(frm_main)
+        frm_submain.pack(side=LEFT)
+
+        # Packing the figure
+        canvas2 = FigureCanvasTkAgg(self._figure2, master=frm_submain)
+        self._canvas2 = canvas2
+        canvas2.show()
+        canvas2.get_tk_widget().pack(side=TOP)#, fill=BOTH)
+
+        #..................................................
+        # This is other frame to hold the treeview and the scroll bar
+        frm_tree = Frame(frm_submain)
+        frm_tree.pack(side=BOTTOM, fill=BOTH, expand=1)
+
+        # Los scrollers
+        ysb = Scrollbar(frm_tree, orient='vertical')
+        xsb = Scrollbar(frm_tree, orient='horizontal')
+        
+        self._table = Treeview(frm_tree,
+                               yscrollcommand=ysb.set,
+                               xscrollcommand=xsb.set)
+
+        ysb.config(command=self._table.yview)
+        xsb.config(command=self._table.xview)
+        #self._table.grid(row=0,column=0)
+        #ysb.grid(row=0,column=1)
+        #xsb.grid(row=1,column=0)
+
+        ysb.pack(side=RIGHT,fill=Y,expand=1)
+        xsb.pack(side=BOTTOM,fill=X,expand=1)
+        self._table.pack(side=LEFT, fill=BOTH, expand=1)
+        
+
         
         # Frame for play / stop buttons
         btn_frame = Frame(self._parent)
@@ -191,20 +252,14 @@ class WndCal(Frame):
         #self._canvas.show()
         
     def define_chess(self):
-        #d = DefineChess(self._parent)
-        d = DefineChess(self._parent,
-                        self._chess["shape"],
-                        self._chess["size"])
+        cols = ("M1VX", "M1VY", "M1VZ")
+        self._table["columns"] = cols
         
-        try:
-            shape, thesize= d.result
-        except TypeError:
-            return
+        for c in cols:
+            self._table.column(c, width=60, anchor='c')
+            self._table.heading(c, text=c)
         
-        print shape, thesize
-
-        self._chess = { "shape" : shape,
-                        "size"  : thesize}
+        self._table["show"] = "headings"
 
         
     def go_start(self):
