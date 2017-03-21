@@ -17,18 +17,41 @@ def _hamming_distance(a, b):
     b = array(b)
     return len(a[a!=b])
 
+
+def brightness_contrast(img, brightness, contrast):
+    '''Changes brightness and contrast of the image'''
+
+    brillo = brightness
+    contraste = contrast/255.
+        
+    marc2 = img.copy()
+        
+    marc2 = uint8(clip(marc2*contraste + brillo, 0, 255))
+    marc_gris = cv2.cvtColor(marc2, cv2.COLOR_BGR2GRAY)
+    
+    return marc_gris
+
+def threshold(img, threshold):
+    '''Thresholds an image'''
+    
+    th, marc_bw = cv2.threshold(img, threshold, 255, cv2.THRESH_BINARY)
+    
+    return marc_bw
+
             
 #
-def find_marker_in_image(img, marc_gris, marker, thr_len=50, crnr_dist=50):
+def find_marker_in_image(img, marc_gris, frame, marker, thr_len=50, crnr_dist=50, draw_fn=None):
     '''Finds an AR marker defined by marker in a binary image'''
 
     # Tamaño del patrone
     marker_size = shape(marker)
     # The size of the matriz for averaging
     mt_size = tuple((m+2)*25 for m in marker_size)
+    
+    #draw_fn(img, gray="True")
 
     # Búsqueda de contornos
-    bw_c, cont = cv2.findContours(img,
+    bw_c, cont, _ = cv2.findContours(img,
                                   cv2.RETR_TREE,
                                   cv2.CHAIN_APPROX_SIMPLE)
     
@@ -36,7 +59,7 @@ def find_marker_in_image(img, marc_gris, marker, thr_len=50, crnr_dist=50):
     
     # Los contornos que pueden ser marcadores
     cntrn = []
-    for cnt in bw_c:
+    for cnt in cont:
         if cv2.arcLength(cnt, True) > thr_len:
             cntrn.append(cnt)
         cntrn.append(cnt)
@@ -70,18 +93,10 @@ def find_marker_in_image(img, marc_gris, marker, thr_len=50, crnr_dist=50):
     #for cnt in cntrn:
     
         
-    #print shape(cnt4p)
-    
-    # Dibujamos los contornos encontrados
-    #marc = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-    #marc = img
-    #cv2.drawContours(marc, cnt4p, -1, (0,255,0), 5)    
-    #imshow(marc);
-    
     
     # Buscamos el patron en los contornos
     for cnt in cnt4p:
-        print shape(cnt)
+        #print shape(cnt)
             
         # Cojemos el ajuste poligonal
         epsilon = 0.1*cv2.arcLength(cnt,True)
@@ -133,7 +148,7 @@ def find_marker_in_image(img, marc_gris, marker, thr_len=50, crnr_dist=50):
         # Distancias de hamming del marcador encontrado a los patrones
         dist_Exo = marker_size[0]*marker_size[1]
             
-        # Calculamos la distancia al patróncv2.drawContours(marc, cnt4p, -1, (0,255,0), 5)
+        # Calculamos la distancia al patrón
         # print m["name"]
         the_marc = marc[1:marker_size[0]+1,1:marker_size[0]+1]
         the_marc = array(the_marc, dtype=int)
@@ -152,6 +167,10 @@ def find_marker_in_image(img, marc_gris, marker, thr_len=50, crnr_dist=50):
 
             
         if dist_Exo == 0:
+            if draw_fn != None:
+                cv2.drawContours(frame, cnt, -1, (0,255,0), 5)
+                cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                draw_fn(frame)
             return cnt, dist_Exo, angle, True
     
     

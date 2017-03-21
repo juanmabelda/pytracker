@@ -10,14 +10,14 @@ from numpy import *
 from matplotlib.pyplot import *
 from video_proc import *
 #%%            
-marc = cv2.imread("./samples/IMG_20170313_103826.jpg")
+marc = cv2.imread("./samples/measurement/mes0001.png")
 imshow(marc)
 
 
 #%% Brillo y contraste
 marc2 = marc.copy() # Copiamos la imagen para no machacar la original
 contraste = 1.
-brillo = 0.
+brillo = 163
 marc2 = uint8(clip(marc2*contraste + brillo, 0, 255))
 imshow(marc2)
 
@@ -26,7 +26,7 @@ marc_gris = cv2.cvtColor(marc2, cv2.COLOR_BGR2GRAY)
 imshow(marc_gris, cmap=get_cmap("gray"))
 
 #%% Binarizamos la imagen
-th, marc_bw = cv2.threshold(marc_gris, 129, 255, cv2.THRESH_BINARY)
+th, marc_bw = cv2.threshold(marc_gris, 213, 255, cv2.THRESH_BINARY)
 imshow(marc_bw, "gray")
 
 
@@ -61,6 +61,17 @@ show()
 ret, mtx, dist, rvecs, tvecs = callibration("./samples/VID_20170313_103754.mp4"
                                             ,(7,4),
                                             draw=True)
+
+#%% Leemos la calibracion
+import json
+callib = {}
+with open("./camera_calibrated.ccb", 'r') as outfile:
+    content = outfile.read()
+    callib = json.loads(content)
+    
+for k in callib:
+    callib[k] = array(callib[k])
+
 
 
 #%% Calculamos la posición y la orientación
