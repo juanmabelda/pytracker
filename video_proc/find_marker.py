@@ -21,8 +21,9 @@ def _hamming_distance(a, b):
 def brightness_contrast(img, brightness, contrast):
     '''Changes brightness and contrast of the image'''
 
-    brillo = brightness
-    contraste = contrast/255.
+    brillo = brightness - 128
+    #contraste = contrast/255.
+    contraste = 259.*(contrast + 255.)/(255. * (259. - contrast))
         
     marc2 = img.copy()
         
@@ -164,7 +165,6 @@ def find_marker_in_image(img, marc_gris, frame, marker, thr_len=50, crnr_dist=50
             
             #print "."*12
             #print the_marc
-
             
         if dist_Exo == 0:
             if draw_fn != None:
@@ -176,7 +176,7 @@ def find_marker_in_image(img, marc_gris, frame, marker, thr_len=50, crnr_dist=50
     
     return the_cnt, dist_Exo, angle, False
 
-def get_pose(cont, mtx, dist, sizes=(1.,1.)):
+def get_pose(cont, mtx, dist, angle = 0., sizes=(1.,1.)):
     '''Returns the position and the orientation of the AR marker
        =========================================================
        
@@ -188,6 +188,13 @@ def get_pose(cont, mtx, dist, sizes=(1.,1.)):
        * dist : Distortion coefficients
        * sizes: Size (in metric units) heigth of rows x width of columns
     '''
+    
+    # Formula de Rodrigues
+    # T1 [+] T2 = (T1 + T2 - cross(T1, T2))/(1 - dot(T1,T2))
+    
+    # Vector de Rodrigues de la orientacion del marcador
+    rodr = array([0., 0., tan(angle/2.)])
+    
     
     # Buscamos las esquinas
     epsilon = 0.1*cv2.arcLength(cont,True)                                                 
@@ -213,7 +220,13 @@ def get_pose(cont, mtx, dist, sizes=(1.,1.)):
         
     ret, rvecs, tvecs = cv2.solvePnP(objp, corners, mtx, dist)
     
-    return ret, rvecs, tvecs
+    
+    rvecs = rvecs.reshape(3)
+    rvec_tr = (rodr + rvecs - cross(rodr, rvecs))/(1 - dot(rodr, rvecs))
+    #tvec_tr = tvecs
+    #print tvecs
+    
+    return ret, rvec_tr, tvecs
     
     
 # arrange points for cv2

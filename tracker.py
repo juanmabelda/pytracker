@@ -36,50 +36,6 @@ else:
 
 from tkSimpleDialog import Dialog
 
-class DefineChess(Dialog):
-    def __init__(self, parent, geometry, thesize):
-        self.parent = parent
-        
-        self.vSize = StringVar()
-        self.vSize.set(str(thesize))
-        
-        self.vRows = StringVar()
-        self.vRows.set(str(geometry[0]))
-
-        
-        self.vColumns = StringVar()
-        self.vColumns.set(str(geometry[1]))
-        #self.title("Define chess geometry")
-
-        Dialog.__init__(self, parent, "Define chess geometry")
-    
-    def body(self, master):
-        
-        self.title = "Define chess geometry"
-
-        Label(master, text="Number of rows:").grid(row=0)
-        Label(master, text="Number of columns:").grid(row=1)
-        Label(master, text="Cell size:").grid(row=2)
-
-        self.rows = Entry(master, textvariable=self.vRows)
-        self.columns = Entry(master, textvariable=self.vColumns)
-        self.size = Entry(master, textvariable=self.vSize)
-        
-        self.rows.grid(row=0, column=1)
-        self.columns.grid(row=1, column=1)
-        self.size.grid(row=2, column=1)
-                
-        return self.rows # initial focus
-
-    #def apply(self):
-    def validate(self):
-        rows = int(self.rows.get())
-        columns = int(self.columns.get())
-        the_size = float(self.size.get())
-        self.result = (rows, columns), the_size
-        
-        return 1
-
 
 class WndCal(Frame):
     
@@ -87,7 +43,7 @@ class WndCal(Frame):
         self._parent = parent
         
         # Title of the window
-        parent.title("Callibration")
+        parent.title("Python Tracker")
         
         # The content of the video
         self._video = None
@@ -272,6 +228,7 @@ class WndCal(Frame):
         bright_frame.pack(fill=X)
         br_lab.pack(side=LEFT)
         self._sc_br.pack(side=LEFT,fill=X, expand=1)
+        self._sc_br.set(128)
 
         #............................................................
         # Contrast
@@ -286,7 +243,7 @@ class WndCal(Frame):
         contrast_frame.pack(fill=X)
         ct_lab.pack(side=LEFT)
         self._sc_ct.pack(side=LEFT,fill=X, expand=1)
-        self._sc_ct.set(255)
+        self._sc_ct.set(128)
 
         #............................................................
         # Threshold
@@ -518,34 +475,56 @@ class WndCal(Frame):
         res = dict()
         index = []
         
+        # Creating an new variable to hold the analysis
         for k in mapping:
             res["M"+str(ind)+"P"+k] = []
-            res["M"+str(ind)+"T"+k] = []
+            res["M"+str(ind)+"R"+k] = []
+        
+        # El angulo rotado
+        res["M"+str(ind)+"a"] = []
+            
+        # The size of the marker
+        sizes = (self._marker["size"], self._marker["size"])
         
         
+        # Iterating every frame
         for frame in self._video:
+            
+            # Brightness and contrast analysis
             marc_gris = brightness_contrast(frame,
                                             self._image["brightness"],
                                             self._image["contrast"])
             
             marc_bw = threshold(marc_gris, self._image["threshold"])
             
-            cnt, dist_Exo, angle, ret = find_marker_in_image(marc_bw,
+            try:
+            
+                cnt, dist_Exo, angle, ret = find_marker_in_image(marc_bw,
                                                              marc_gris,
                                                              frame,
                                                              self._marker["marker"],
                                                              crnr_dist = 50,
                                                              draw_fn=self.do_draw)
+            except Exception:
+                ret = False
+                
             
-            ret, rvecs, tvecs = get_pose(cnt,
+            try:
+                ret, rvecs, tvecs = get_pose(cnt,
                                          self._callibration["matrix"],
-                                         self._callibration["distortion"])
+                                         self._callibration["distortion"],
+                                         angle=0.,#angle,
+                                         sizes=sizes)
+            except Exception:
+                ret = False
             
             if ret:
                 index.append(self._video._ind)
                 for k in mapping:
-                    res["M"+str(ind)+"P"+k].append(float(rvecs[mapping[k]]))
-                    res["M"+str(ind)+"T"+k].append(float(tvecs[mapping[k]]))
+                    res["M"+str(ind)+"P"+k].append(float(tvecs[mapping[k]]))
+                    res["M"+str(ind)+"R"+k].append(float(rvecs[mapping[k]]))
+                    
+                res["M"+str(ind)+"a"].append(angle)
 
             
         these_res = pd.DataFrame(res, index=index)

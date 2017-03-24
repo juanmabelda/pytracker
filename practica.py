@@ -46,7 +46,7 @@ patrones = {"marcador1":
             
 
 cnt, dist_Exo, angle, ret = find_marker_in_image(marc_bw,
-                                                 marc_gris,
+                                                 marc_gris, marc,
                                                  patrones["marcador1"],
                                                  crnr_dist = 50)
 
@@ -73,6 +73,8 @@ for k in callib:
     callib[k] = array(callib[k])
 
 
+mtx = callib["matrix"]
+dist = callib["distortion"]
 
 #%% Calculamos la posición y la orientación
 ret, rvecs, tvecs = get_pose(cnt, mtx, dist)
