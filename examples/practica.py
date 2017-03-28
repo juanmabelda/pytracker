@@ -58,10 +58,12 @@ imshow(marc)
 show()
 
 #%% Cogemos la calibración del espacion
-ret, mtx, dist, rvecs, tvecs = callibration("./samples/VID_20170313_103754.mp4"
-                                            ,(7,4),
-                                            draw=True)
-
+#==============================================================================
+# ret, mtx, dist, rvecs, tvecs = callibration("./samples/VID_20170313_103754.mp4"
+#                                             ,(7,4),
+#                                             draw=True)
+# 
+#==============================================================================
 #%% Leemos la calibracion
 import json
 callib = {}

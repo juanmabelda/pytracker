@@ -481,7 +481,7 @@ class WndCal(Frame):
             res["M"+str(ind)+"R"+k] = []
         
         # El angulo rotado
-        res["M"+str(ind)+"a"] = []
+        #res["M"+str(ind)+"a"] = []
             
         # The size of the marker
         sizes = (self._marker["size"], self._marker["size"])
@@ -507,16 +507,23 @@ class WndCal(Frame):
                                                              draw_fn=self.do_draw)
             except Exception:
                 ret = False
+                #self._ruler.set(self._video._ind)
+                self.do_draw(frame)
+                continue
                 
             
             try:
                 ret, rvecs, tvecs = get_pose(cnt,
                                          self._callibration["matrix"],
                                          self._callibration["distortion"],
-                                         angle=0.,#angle,
+                                         angle,
                                          sizes=sizes)
-            except Exception:
+            except Exception as e:
+                print e
+                #self._ruler.set(self._video._ind)
                 ret = False
+                self.do_draw(frame)
+                continue
             
             if ret:
                 index.append(self._video._ind)
@@ -524,7 +531,7 @@ class WndCal(Frame):
                     res["M"+str(ind)+"P"+k].append(float(tvecs[mapping[k]]))
                     res["M"+str(ind)+"R"+k].append(float(rvecs[mapping[k]]))
                     
-                res["M"+str(ind)+"a"].append(angle)
+                #res["M"+str(ind)+"a"].append(angle)
 
             
         these_res = pd.DataFrame(res, index=index)

@@ -8,6 +8,7 @@ Created on Thu Mar  9 09:31:04 2017
 import cv2
 from numpy import *
 from matplotlib.pyplot import *
+from scipy.linalg import norm
 
 
 # La distancia de hamming
@@ -221,12 +222,37 @@ def get_pose(cont, mtx, dist, angle = 0., sizes=(1.,1.)):
     ret, rvecs, tvecs = cv2.solvePnP(objp, corners, mtx, dist)
     
     
-    rvecs = rvecs.reshape(3)
-    rvec_tr = (rodr + rvecs - cross(rodr, rvecs))/(1 - dot(rodr, rvecs))
+    rvecs = vang2rodr(rvecs.reshape(3))
+    #rvec_tr = (rodr + rvecs - cross(rodr, rvecs))/(1 - dot(rodr, rvecs))
+    rvec_tr = rodrigues(rodr, rvecs)
     #tvec_tr = tvecs
     #print tvecs
     
     return ret, rvec_tr, tvecs
+
+# La transposicion de movimientos segun Rodriges
+def rodrigues(Omega1, Omega2):
+    '''Composition of rotations using Rodrigues vectors'''
+    res = (Omega1 + Omega2 - cross(Omega1, Omega2))/(1 - dot(Omega1, Omega2))
+    
+    return res
+
+def vang2rodr(vang):
+    '''Transfors an angle vector array to a rodrigues vector array'''
+    
+    if len(shape(vang))==1:
+        ang = norm(vang)
+        unit  = array(vang)/ang
+        rodr = tan(ang/2)*unit
+    else:    
+        # The norm of the vector is the turning angle
+        ang = norm(vang, axis=1)      
+        # The direction of rotation (unitary vector)
+        unit = array( [v/a for v, a in zip(vang,ang)])        
+        # Rodrigues vector
+        rodr = array([u*tan(a/2) for u, a in zip(unit, ang)])   
+    
+    return rodr
     
     
 # arrange points for cv2
