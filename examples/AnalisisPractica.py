@@ -13,7 +13,7 @@ from scipy.linalg import norm
 from video_proc import *
 
 #%%
-res = pd.read_csv("resultados_practica.csv", sep="\t")
+res = pd.read_csv("./examples/resultados_practica2.csv", sep="\t")
 
 # Los vectores angulo
 rang1 = array(res[["M1RX", "M1RY", "M1RZ"]])
@@ -35,4 +35,18 @@ plot(angulo)
 subplot(2,1,2)
 plot(unit)
 legend(["x", "y", "z"])
+
+#%%
+ta1 = norm(rang1, axis=1)
+ta2 = norm(rang2, axis=1)
+
+a1 = 2*arctan(ta1)*180/pi
+a2 = 2*arctan(ta2)*180/pi
+
+subplot(2,1,1)
+plot(a1)
+plot(a2)
+
+subplot(2,1,2)
+plot(a2-a1)
 

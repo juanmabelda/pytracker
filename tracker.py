@@ -505,6 +505,8 @@ class WndCal(Frame):
                                                              self._marker["marker"],
                                                              crnr_dist = 50,
                                                              draw_fn=self.do_draw)
+                
+                #print angle
             except Exception:
                 ret = False
                 #self._ruler.set(self._video._ind)
@@ -519,7 +521,7 @@ class WndCal(Frame):
                                          angle,
                                          sizes=sizes)
             except Exception as e:
-                print e
+                print e, "Algo ha salido mal"
                 #self._ruler.set(self._video._ind)
                 ret = False
                 self.do_draw(frame)

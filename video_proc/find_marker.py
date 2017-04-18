@@ -159,7 +159,7 @@ def find_marker_in_image(img, marc_gris, frame, marker, thr_len=50, crnr_dist=50
             dist_e = _hamming_distance(the_marc, marker)
             if dist_e < dist_Exo:
                 dist_Exo = dist_e
-                angle = c*pi/2
+                angle = -c*pi/2
                 the_cnt = cnt
                                 
             the_marc = rot90(the_marc)
