@@ -23,6 +23,7 @@ rang2 = array(res[["M2RX", "M2RY", "M2RZ"]])
 #%% El angulo relativo
 
 relat = array([rodrigues(r1, -r2) for r1, r2 in zip(rang1, rang2)])
+#relat = array([rodrigues(r2, -r1) for r1, r2 in zip(rang1, rang2)])
 
 modulo = norm(relat, axis=1)
 unit = array([r/m for r, m in zip(relat, modulo)])
@@ -36,17 +37,17 @@ subplot(2,1,2)
 plot(unit)
 legend(["x", "y", "z"])
 
-#%%
-ta1 = norm(rang1, axis=1)
-ta2 = norm(rang2, axis=1)
 
-a1 = 2*arctan(ta1)*180/pi
-a2 = 2*arctan(ta2)*180/pi
+#%% Posiciones
+pos1 = array(res[["M1PX", "M1PY", "M1PZ"]])
+pos2 = array(res[["M2PX", "M2PY", "M2PZ"]])
+R = pos2 - pos1
+
+figure()
 
 subplot(2,1,1)
-plot(a1)
-plot(a2)
+plot(R)
+legend(["X", "Y", "Z"])
 
 subplot(2,1,2)
-plot(a2-a1)
-
+plot(norm(R, axis=-1))

@@ -213,11 +213,20 @@ def get_pose(cont, mtx, dist, angle = 0., sizes=(1.,1.)):
 #    objp[1] = array([[0.],[1.],[0.]])
 #    objp[2] = array([[1.],[1.],[0.]])
 #    objp[3] = array([[1.],[0.],[0.]])
+
+    hs0 = float(sizes[0])/2.
+    hs1 = float(sizes[1])/2.
         
-    objp = _arrange_points(array([[0.      , 0.      , 0.],
-                                  [0.      , sizes[1], 0.],
-                                  [sizes[0], sizes[1], 0.],
-                                  [sizes[0], 0.      , 0.]]))
+#    objp = _arrange_points(array([[0.      , 0.      , 0.],
+#                                  [0.      , sizes[1], 0.],
+#                                  [sizes[0], sizes[1], 0.],
+#                                  [sizes[0], 0.      , 0.]]))
+
+    objp = _arrange_points(array([[-hs0    , -hs1    , 0.],
+                                  [-hs0    ,  hs1    , 0.],
+                                  [ hs0    ,  hs1    , 0.],
+                                  [ hs0    , -hs1    , 0.]]))
+
         
     ret, rvecs, tvecs = cv2.solvePnP(objp, corners, mtx, dist)
     
@@ -230,15 +239,25 @@ def get_pose(cont, mtx, dist, angle = 0., sizes=(1.,1.)):
     
     return ret, rvec_tr, tvecs
 
-# La transposicion de movimientos segun Rodriges
+# La composicion de movimientos segun Rodriges
 def rodrigues(Omega1, Omega2):
     '''Composition of rotations using Rodrigues vectors'''
     res = (Omega1 + Omega2 - cross(Omega1, Omega2))/(1 - dot(Omega1, Omega2))
     
     return res
 
+# Rotacion de un vector respecto de un vector de Rodrigues
+def rodr_rot(Omega, v):
+    '''Rotation of a vector through a Rodrigues vector'''
+    
+    vt = v + (2/(1 + dot(Omega, Omega))) * \
+         (cross(Omega, v) + cross(Omega, cross(Omega, v)))
+    
+    return vt
+
+
 def vang2rodr(vang):
-    '''Transfors an angle vector array to a rodrigues vector array'''
+    '''Transforms an angle vector array to a rodrigues vector array'''
     
     if len(shape(vang))==1:
         ang = norm(vang)
