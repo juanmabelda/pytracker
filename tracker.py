@@ -9,6 +9,7 @@ Created on Wed Mar 15 15:05:14 2017
 import matplotlib
 import json
 import pandas as pd
+import os
 #import cv2
 matplotlib.use('TkAgg')
 
@@ -67,12 +68,21 @@ class WndCal(Frame):
         self._callibration = dict()
         
         # By default marker
-        self._marker = {"marker" : [[1, 1, 1, 0, 0],
-                                    [1, 0, 0, 1, 0],
-                                    [1, 1, 1, 0, 0],
-                                    [1, 0, 0, 1, 0],
-                                    [1, 0, 0, 0, 1]],
-                        "size"   : 0.03}
+        marker = {"marker" : [[1, 1, 1, 0, 0],
+                              [1, 0, 0, 1, 0],
+                              [1, 1, 1, 0, 0],
+                              [1, 0, 0, 1, 0],
+                              [1, 0, 0, 0, 1]],
+                  "size"   : 0.03}
+        
+        # The dictionary of markers
+        self._markers = {}
+        self._markers["default"] = marker
+
+        self._curmarker = StringVar()
+        self._curmarker.set("default")
+ 
+        
         
         # The menu
         menu = Menu(parent)
@@ -98,6 +108,14 @@ class WndCal(Frame):
         markermenu = Menu(menu)
         menu.add_cascade(label="Marker", menu=markermenu)
         markermenu.add_command(label="Load marker", command=self.load_marker)
+        markermenu.add_separator()
+        
+        markermenu.add_radiobutton(label="default",
+                                   command = self.select_marker,
+                                   variable=self._curmarker)
+        
+        self._markermenu = markermenu
+        
         
         # The main frame to hold the main figure the AR marker figure and
         # the treeview
@@ -145,7 +163,7 @@ class WndCal(Frame):
         
         
         #from numpy.random import rand
-        axes2.imshow(array(self._marker["marker"])*255)
+        axes2.imshow(array(marker["marker"])*255)
         
         #......................................................
         # Another frame to hold AR and marker
@@ -338,8 +356,23 @@ class WndCal(Frame):
         
         with open(filename, 'r') as outfile:
             content = outfile.read()
-            self._marker = json.loads(content)
+            marker = json.loads(content)
             
+        #storing the marker in the list
+        mrkr_name = filename.split(os.sep)[-1]
+        self._markers[mrkr_name] = marker
+        
+        #Setting the new marker as current
+        self._curmarker.set(mrkr_name)
+
+        # Creating a new menu for the new marker
+        self._markermenu.add_radiobutton(label=mrkr_name,
+                                         command = self.select_marker,
+                                         variable=self._curmarker)
+        
+        #marker
+        
+        # Drawing the new marker
         self.draw_marker()
             
         
@@ -352,7 +385,9 @@ class WndCal(Frame):
 #        
 #        self._table["show"] = "headings"
 
-        
+    def select_marker(self):
+        self.draw_marker()
+    
     def go_start(self):
         
         # If there is no video, we move out
@@ -403,8 +438,7 @@ class WndCal(Frame):
         self._ruler.config(to=len(self._video)-1)
         img = self._video.frame()
         self.do_draw(img)
-
-        
+       
         
     def mark_start(self):
         valor = int(self._ruler.get())
@@ -462,13 +496,15 @@ class WndCal(Frame):
         
     def draw_marker(self):
         self._axes2.clear()
-        self._axes2.imshow(array(self._marker["marker"])*255)
+        marker = self._markers[self._curmarker.get()]
+        self._axes2.imshow(array(marker["marker"])*255)
         self._canvas2.show()
     
     def track(self):        
         self._onTrack=True
         
-        ind = (len(self._results.keys())/6)+1
+        ind = self._curmarker.get()
+        marker = self._markers[ind]
         
         mapping = {"X" : 0, "Y" : 1 , "Z" : 2}
         
@@ -484,7 +520,7 @@ class WndCal(Frame):
         #res["M"+str(ind)+"a"] = []
             
         # The size of the marker
-        sizes = (self._marker["size"], self._marker["size"])
+        sizes = (marker["size"], marker["size"])
         
         
         # Iterating every frame
@@ -502,7 +538,7 @@ class WndCal(Frame):
                 cnt, dist_Exo, angle, ret = find_marker_in_image(marc_bw,
                                                              marc_gris,
                                                              frame,
-                                                             self._marker["marker"],
+                                                             marker["marker"],
                                                              crnr_dist = 50,
                                                              draw_fn=self.do_draw)
                 
