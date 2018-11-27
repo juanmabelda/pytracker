@@ -18,9 +18,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #, NavigationToo
 # implement the default mpl key bindings
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.pyplot import get_cmap
-from tkFileDialog   import askopenfilename, askdirectory, asksaveasfilename
-from ttk import Treeview, Scrollbar
-import tkMessageBox
+from tkinter.filedialog   import askopenfilename, askdirectory, asksaveasfilename
+from tkinter.ttk import Treeview, Scrollbar
+from tkinter import messagebox as tkMessageBox
 
 # The video management system
 from video_proc import *
@@ -35,7 +35,7 @@ else:
     from tkinter import *
 
 
-from tkSimpleDialog import Dialog
+from  tkinter import simpledialog as tkSimpleDialog
 
 
 class WndCal(Frame):

@@ -14,8 +14,8 @@ from numpy import arange, sin, pi
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #, NavigationToolbar2TkAgg
 # implement the default mpl key bindings
 from matplotlib.backend_bases import key_press_handler
-from tkFileDialog   import askopenfilename, askdirectory, asksaveasfilename
-import tkMessageBox
+from tkinter.filedialog   import askopenfilename, askdirectory, asksaveasfilename
+from tkinter import messagebox as tkMessageBox
 
 # The video management system
 from video_proc import *
@@ -30,7 +30,7 @@ else:
     from tkinter import *
 
 
-from tkSimpleDialog import Dialog
+from tkinter.simpledialog import Dialog
 
 class DefineChess(Dialog):
     def __init__(self, parent, geometry, thesize):

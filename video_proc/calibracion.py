@@ -8,7 +8,7 @@ Created on Wed Mar  8 15:00:37 2017
 from numpy import *
 from matplotlib.pyplot import *
 import cv2
-from videofile_mgn import videofile
+from . videofile_mgn import videofile
 
 # termination criteria
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
