@@ -30,7 +30,7 @@ class videofile():
     def __iter__(self):
         return self
         
-    def next(self):
+    def __next__(self):
         if self._ind >= self._to:
             raise StopIteration
         

@@ -51,7 +51,7 @@ def callibration(video, chessboard, draw_func=None, the_size = 0.03):
                 #cv2.imshow('img',img)
                 #cv2.waitKey(50)
                 
-        print video._ind, ret
+        print(video._ind, ret)
             
     
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints,
@@ -74,7 +74,7 @@ def main(argv=None):
     else:
         return
         
-    print cal
+    print(cal)
     
 if __name__=="__main__":    
     sys.exit(main(sys.argv))

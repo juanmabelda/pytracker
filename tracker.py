@@ -557,7 +557,7 @@ class WndCal(Frame):
                                          angle,
                                          sizes=sizes)
             except Exception as e:
-                print e, "Algo ha salido mal"
+                print(e, "Algo ha salido mal")
                 #self._ruler.set(self._video._ind)
                 ret = False
                 self.do_draw(frame)
@@ -574,7 +574,7 @@ class WndCal(Frame):
             
         these_res = pd.DataFrame(res, index=index)
         self._results = pd.concat([self._results, these_res], axis=1)
-        print self._results
+        print(self._results)
             
         self.onTrack=False
             

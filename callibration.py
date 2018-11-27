@@ -201,7 +201,7 @@ class WndCal(Frame):
         except TypeError:
             return
         
-        print shape, thesize
+        print(shape, thesize)
 
         self._chess = { "shape" : shape,
                         "size"  : thesize}
