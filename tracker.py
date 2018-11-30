@@ -143,7 +143,7 @@ class WndCal(Frame):
         canvas = FigureCanvasTkAgg(self._figure, master=frm_main)
         self._canvas = canvas
         #from numpy.random import rand
-        canvas.show()
+        canvas.draw()
         canvas.get_tk_widget().pack(side=LEFT, fill=BOTH, expand=1)
         
         # Another figure for the AR marker
@@ -173,7 +173,7 @@ class WndCal(Frame):
         # Packing the figure
         canvas2 = FigureCanvasTkAgg(self._figure2, master=frm_submain)
         self._canvas2 = canvas2
-        canvas2.show()
+        canvas2.draw()
         canvas2.get_tk_widget().pack(side=TOP)#, fill=BOTH)
 
         #..................................................
@@ -491,14 +491,14 @@ class WndCal(Frame):
         else:
             self._axes.imshow(img)
             
-        self._canvas.show()
+        self._canvas.draw()
         self._canvas.flush_events()
         
     def draw_marker(self):
         self._axes2.clear()
         marker = self._markers[self._curmarker.get()]
         self._axes2.imshow(array(marker["marker"])*255)
-        self._canvas2.show()
+        self._canvas2.draw()
     
     def track(self):        
         self._onTrack=True

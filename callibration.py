@@ -134,7 +134,7 @@ class WndCal(Frame):
         canvas = FigureCanvasTkAgg(self._figure, master=parent)
         self._canvas = canvas
         #from numpy.random import rand
-        canvas.show()
+        canvas.draw()
         canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
         
         # Frame for play / stop buttons
@@ -292,7 +292,7 @@ class WndCal(Frame):
 
         self._axes.clear()
         self._axes.imshow(img)
-        self._canvas.show()
+        self._canvas.draw()
         self._canvas.flush_events()
     
     def callibrate(self):
