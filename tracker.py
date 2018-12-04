@@ -129,12 +129,12 @@ class WndCal(Frame):
         # Removing the uwanted things of the axes
         axes.tick_params(axis="both",
                          which="both",
-                         top="off",
-                         bottom="off",
-                         left="off",
-                         right="off",
-                         labelbottom="off",
-                         labelleft="off")
+                         top=False,
+                         bottom=False,
+                         left=False,
+                         right=False,
+                         labelbottom=False,
+                         labelleft=False)
         
         self._axes = axes
         #self._axes.hold(False) # To provide some cleaning
@@ -152,12 +152,12 @@ class WndCal(Frame):
         # Removing the uwanted things of the axes
         axes2.tick_params(axis="both",
                          which="both",
-                         top="off",
-                         bottom="off",
-                         left="off",
-                         right="off",
-                         labelbottom="off",
-                         labelleft="off")
+                         top=False,
+                         bottom=False,
+                         left=False,
+                         right=False,
+                         labelbottom=False,
+                         labelleft=False)
         
         self._axes2 = axes2
         
